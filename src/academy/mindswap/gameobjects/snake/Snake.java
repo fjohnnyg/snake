@@ -1,6 +1,7 @@
 package academy.mindswap.gameobjects.snake;
-
+import academy.mindswap.field.Field;
 import academy.mindswap.field.Position;
+
 import java.util.LinkedList;
 
 public class Snake {
@@ -17,7 +18,7 @@ public class Snake {
         this.alive = true;
 
         for (int i = 0; i < SNAKE_INITIAL_SIZE; i++) {
-            snakePieces.add(new Position(50 - i, 12));
+            snakePieces.add(new Position((Field.getWidth() / 2) - i, Field.getHeight() / 2));
         }
     }
 
@@ -26,32 +27,50 @@ public class Snake {
     }
 
     public void move(Direction direction) {
+        if (movementExceptions(direction)) return;
+
+        this.direction = direction;
         switch (direction) {
             case RIGHT: {
-                setDirection(Direction.RIGHT);
                 snakePieces.addFirst(new Position(getHead().getCol() + 1, getHead().getRow()));
                 snakePieces.removeLast();
                 break;
+
             }
             case LEFT: {
-                setDirection(Direction.LEFT);
                 snakePieces.addFirst(new Position(getHead().getCol() -1 , getHead().getRow()));
                 snakePieces.removeLast();
                 break;
+
             }
             case DOWN: {
-                setDirection(Direction.DOWN);
                 snakePieces.addFirst(new Position(getHead().getCol(), getHead().getRow() + 1));
                 snakePieces.removeLast();
                 break;
+
             }
             case UP: {
-                setDirection(Direction.UP);
                 snakePieces.addFirst(new Position(getHead().getCol(), getHead().getRow() -1));
                 snakePieces.removeLast();
                 break;
             }
         }
+    }
+
+    private boolean movementExceptions(Direction direction) {
+        if ((this.direction == Direction.RIGHT) && (direction == Direction.LEFT))
+            return true;
+
+        if ((this.direction == Direction.LEFT) && (direction == Direction.RIGHT))
+            return true;
+
+        if ((this.direction == Direction.UP) && (direction == Direction.DOWN))
+            return true;
+
+        if ((this.direction == Direction.DOWN) && (direction == Direction.UP))
+            return true;
+
+        return false;
     }
 
     public void move(){
@@ -81,10 +100,5 @@ public class Snake {
     public int getSnakeSize() {
         return snakePieces.size();
     }
-
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
 }
 

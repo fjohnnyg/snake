@@ -12,34 +12,30 @@ public class Game {
     private Snake snake;
     private Fruit fruit;
     private int delay;
+    private int score;
 
     public Game(int cols, int rows, int delay) {
         Field.init(cols, rows);
         snake = new Snake();
         this.delay = delay;
+        this.score = score;
     }
 
     public void start() throws InterruptedException {
-
         generateFruit();
 
-        while (true) {
+        while (snake.isAlive()) {
             Thread.sleep(delay);
             Field.clearTail(snake);
             moveSnake();
             checkCollisions();
             Field.drawSnake(snake);
-            if (!snake.isAlive())
-                break;
         }
     }
 
     private void generateFruit() {
-
-        while (fruit == null) {
-            fruit = new Fruit();
-            Field.drawFruit(fruit);
-        }
+        fruit = new Fruit();
+        Field.drawFruit(fruit);
     }
 
     private void moveSnake() {
@@ -68,30 +64,29 @@ public class Game {
         snake.move();
     }
 
+    private int increaseScore() {
+        return score++;
+    }
+
     private void checkCollisions() {
-        //check wall collision
-        for (int i = 0; i < Field.getHeight(); i++) {
-            if ((snake.getHead().getCol() == 0) || snake.getHead().getCol() == 99)
-                snake.die();
-        }
-        for (int i = 0; i < Field.getWidth(); i++) {
-            if (snake.getHead().getRow() == 0 || snake.getHead().getRow() == 24)
-                snake.die();
-        }
+        if (snake.getHead().getCol() == 1 || snake.getHead().getCol() == Field.getWidth() - 2 ||
+                snake.getHead().getRow() == 1 || snake.getHead().getRow() == Field.getHeight() - 2)
+            snake.die();
 
-        //check body collision
         for (int i = 1; i < snake.getSnakeSize(); i++) {
-            if (snake.getHead().equals(snake.getFullSnake().get(i))) {
+            if (snake.getHead().equals(snake.getFullSnake().get(i)))
                 snake.die();
-            }
         }
 
-        //check fruit collision
         if (snake.getHead().equals(fruit.getPosition())) {
             snake.increaseSize();
-            fruit = null;
             this.delay -= 5;
+            increaseScore();
             generateFruit();
         }
+    }
+
+    public int getScore() {
+        return score;
     }
 }
